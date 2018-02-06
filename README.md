@@ -1,3 +1,39 @@
+## 打包
+
+``` bash
+mvn -Prelease-all -DskipTests clean install -U
+```
+
+## 打包之后运行
+
+``` bash
+cd distribution/target/apache-rocketmq
+sh bin/mqnamesrv
+sh bin/mqbroker -n localhost:9876
+
+# 发送消息
+export NAMESRV_ADDR=localhost:9876
+sh bin/tools.sh org.apache.rocketmq.example.quickstart.Producer
+
+# 接受消息
+sh bin/tools.sh org.apache.rocketmq.example.quickstart.Consumer
+```
+
+## 打包之后关闭
+
+``` bash
+sh bin/mqshutdown broker
+sh bin/mqshutdown namesrv
+```
+
+## 对源码做过的主要调整
+
+- 删除 `runserver.sh`、`runbroker.sh`、`tools.sh` 脚本默认需要的内存大小
+- 删除 `pom.xml` 中的 `checkstyle` 的插件
+- 在 `example` 子模块下面添加适合在 `idea` 开发环境中直接运行的类 `IdeaRocketMQMain`
+
+---
+
 ## Apache RocketMQ [![Build Status](https://travis-ci.org/apache/rocketmq.svg?branch=master)](https://travis-ci.org/apache/rocketmq) [![Coverage Status](https://coveralls.io/repos/github/apache/rocketmq/badge.svg?branch=master)](https://coveralls.io/github/apache/rocketmq?branch=master)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.apache.rocketmq/rocketmq-all/badge.svg)](http://search.maven.org/#search%7Cga%7C1%7Corg.apache.rocketmq)
 [![GitHub release](https://img.shields.io/badge/release-download-orange.svg)](https://rocketmq.apache.org/dowloading/releases)
