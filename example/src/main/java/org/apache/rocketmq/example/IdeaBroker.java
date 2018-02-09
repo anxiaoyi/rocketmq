@@ -10,7 +10,7 @@ public class IdeaBroker {
     }
 
     public static void main(String...args) {
-        BrokerStartup.main(new String[]{ "-n", "localhost:9876;localhost:9877" });
+        BrokerStartup.main(new String[]{ "-n", "localhost:9876" });
         System.out.println("The Broker Server boot success.");
     }
 
