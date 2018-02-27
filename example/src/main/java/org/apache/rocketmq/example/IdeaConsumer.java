@@ -6,7 +6,7 @@ import org.apache.rocketmq.example.quickstart.Consumer;
 public class IdeaConsumer {
 
     static {
-        LinuxEnv.setEnv("NAMESRV_ADDR", "localhost:9876;localhost:9877");
+        LinuxEnv.setEnv("NAMESRV_ADDR", "localhost:9876");
     }
 
     public static void main(String[] args) throws MQClientException, InterruptedException {
