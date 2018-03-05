@@ -33,6 +33,8 @@ sh bin/mqshutdown namesrv
 - 在 `example` 子模块下面添加适合在 `idea` 开发环境中直接运行的类 `IdeaRocketMQMain`
 - 调整 `BrokerController.java` 中默认每隔 30 秒注册 Broker 到 NameServer 的时间为 1 小时，主要是为了减少 DEBUG 影响
 - 调整 `Producer.java` 的默认发送测试消息条数 (原来为 1000 条)
+- RocketMQ 的默认 log 信息位于 `~/logs/rocketmqlogs`
+- 添加 `AllocateMessageQueueStrategyAssert` 类来查看消息队列分配策略是如何工作的
 
 ---
 
