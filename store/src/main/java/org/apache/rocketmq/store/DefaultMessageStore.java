@@ -1066,6 +1066,10 @@ public class DefaultMessageStore implements MessageStore {
     public ConsumeQueue findConsumeQueue(String topic, int queueId) {
         ConcurrentMap<Integer, ConsumeQueue> map = consumeQueueTable.get(topic);
         if (null == map) {
+            if (!topic.equals("SCHEDULE_TOPIC_XXXX")) {
+                log.info("create ConsumeQueueMap with topic {}", topic);
+            }
+
             ConcurrentMap<Integer, ConsumeQueue> newMap = new ConcurrentHashMap<Integer, ConsumeQueue>(128);
             ConcurrentMap<Integer, ConsumeQueue> oldMap = consumeQueueTable.putIfAbsent(topic, newMap);
             if (oldMap != null) {
@@ -1077,6 +1081,11 @@ public class DefaultMessageStore implements MessageStore {
 
         ConsumeQueue logic = map.get(queueId);
         if (null == logic) {
+
+            if (!topic.equals("SCHEDULE_TOPIC_XXXX")) {
+                log.info("create ConsumeQueue with topic {} with queueId {}", topic, queueId);
+            }
+
             ConsumeQueue newLogic = new ConsumeQueue(
                 topic,
                 queueId,
@@ -1355,6 +1364,7 @@ public class DefaultMessageStore implements MessageStore {
 
     public void putMessagePositionInfo(DispatchRequest dispatchRequest) {
         ConsumeQueue cq = this.findConsumeQueue(dispatchRequest.getTopic(), dispatchRequest.getQueueId());
+        log.info("put message to {}-{}", dispatchRequest.getTopic(), dispatchRequest.getQueueId());
         cq.putMessagePositionInfoWrapper(dispatchRequest);
     }
 
@@ -1724,6 +1734,10 @@ public class DefaultMessageStore implements MessageStore {
         }
 
         private boolean isCommitLogAvailable() {
+            if (this.reputFromOffset < DefaultMessageStore.this.commitLog.getMaxOffset()) {
+                log.info( "[ZK] {} < {}, commitLogAvailable: true", this.reputFromOffset, DefaultMessageStore.this.commitLog.getMaxOffset());
+            }
+
             return this.reputFromOffset < DefaultMessageStore.this.commitLog.getMaxOffset();
         }
 

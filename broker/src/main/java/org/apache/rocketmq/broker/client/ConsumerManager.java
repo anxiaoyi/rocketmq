@@ -17,12 +17,6 @@
 package org.apache.rocketmq.broker.client;
 
 import io.netty.channel.Channel;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import org.apache.rocketmq.common.constant.LoggerName;
 import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 import org.apache.rocketmq.common.protocol.heartbeat.ConsumeType;
@@ -32,6 +26,14 @@ import org.apache.rocketmq.remoting.common.RemotingHelper;
 import org.apache.rocketmq.remoting.common.RemotingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class ConsumerManager {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.BROKER_LOGGER_NAME);
@@ -118,6 +120,13 @@ public class ConsumerManager {
         }
 
         this.consumerIdsChangeListener.handle(ConsumerGroupEvent.REGISTER, group, subList);
+
+        log.info("[ZK]当前 consumer 列表： {}", this.consumerTable);
+        for (Map.Entry<String, ConsumerGroupInfo> entry: this.consumerTable.entrySet()) {
+            log.info("group: {}", entry.getKey());
+            log.info("所有话题: {}", entry.getValue().getSubscribeTopics());
+            log.info("所有消费者: {}", entry.getValue().getAllClientId());
+        }
 
         return r1 || r2;
     }

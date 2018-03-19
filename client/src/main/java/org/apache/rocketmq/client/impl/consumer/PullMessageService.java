@@ -87,6 +87,11 @@ public class PullMessageService extends ServiceThread {
             try {
                 PullRequest pullRequest = this.pullRequestQueue.take();
                 if (pullRequest != null) {
+                    log.info("[ZK] take pullRequest {}-{}-{}-{}",
+                            pullRequest.getConsumerGroup(),
+                            pullRequest.getMessageQueue().getTopic(),
+                            pullRequest.getMessageQueue().getQueueId(),
+                            pullRequest.getNextOffset());
                     this.pullMessage(pullRequest);
                 }
             } catch (InterruptedException e) {

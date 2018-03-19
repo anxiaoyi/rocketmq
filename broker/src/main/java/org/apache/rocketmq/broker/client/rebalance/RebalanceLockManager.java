@@ -143,6 +143,7 @@ public class RebalanceLockManager {
                             lockEntry = new LockEntry();
                             lockEntry.setClientId(clientId);
                             groupValue.put(mq, lockEntry);
+                            System.out.println(clientId + " 锁定 " + mq);
                             log.info(
                                 "tryLockBatch, message queue not locked, I got it. Group: {} NewClientId: {} {}",
                                 group,
@@ -167,9 +168,12 @@ public class RebalanceLockManager {
                                 oldClientId,
                                 clientId,
                                 mq);
+                            System.out.println(mq + " 原来锁定的 " + oldClientId + " 过期了，所以 " + clientId + " 获得了锁");
                             lockedMqs.add(mq);
                             continue;
                         }
+
+                        System.out.println(mq + " 正在被 " + oldClientId + " 锁定");
 
                         log.warn(
                             "tryLockBatch, message queue locked by other client. Group: {} OtherClientId: {} NewClientId: {} {}",
@@ -204,12 +208,14 @@ public class RebalanceLockManager {
                                     group,
                                     mq,
                                     clientId);
+                                System.out.println(clientId + " 解锁 " + mq);
                             } else {
                                 log.warn("unlockBatch, but mq locked by other client: {}, Group: {} {} {}",
                                     lockEntry.getClientId(),
                                     group,
                                     mq,
                                     clientId);
+                                System.out.println(clientId + " 解锁失败 " + mq + ", 因为其正在被 " + lockEntry.getClientId() + " 锁定");
                             }
                         } else {
                             log.warn("unlockBatch, but mq not locked, Group: {} {} {}",

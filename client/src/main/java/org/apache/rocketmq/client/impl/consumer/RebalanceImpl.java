@@ -65,6 +65,7 @@ public abstract class RebalanceImpl {
     }
 
     public void unlock(final MessageQueue mq, final boolean oneway) {
+        log.info("[ZK] unlock {}-{}-{}", mq.getBrokerName(), mq.getTopic(), mq.getQueueId());
         FindBrokerResult findBrokerResult = this.mQClientFactory.findBrokerAddressInSubscribe(mq.getBrokerName(), MixAll.MASTER_ID, true);
         if (findBrokerResult != null) {
             UnlockBatchRequestBody requestBody = new UnlockBatchRequestBody();
@@ -297,6 +298,8 @@ public abstract class RebalanceImpl {
                         allocateResultSet.addAll(allocateResult);
                     }
 
+                    System.out.println("分配到消费的消息队列: " + allocateResultSet);
+
                     boolean changed = this.updateProcessQueueTableInRebalance(topic, allocateResultSet, isOrder);
                     if (changed) {
                         log.info(
@@ -370,10 +373,12 @@ public abstract class RebalanceImpl {
         for (MessageQueue mq : mqSet) {
             if (!this.processQueueTable.containsKey(mq)) {
                 if (isOrder && !this.lock(mq)) {
+                    System.out.println("锁定失败 " + mq);
                     log.warn("doRebalance, {}, add a new mq failed, {}, because lock failed", consumerGroup, mq);
                     continue;
                 }
 
+                System.out.println("锁定成功 " + mq);
                 this.removeDirtyOffset(mq);
                 ProcessQueue pq = new ProcessQueue();
                 long nextOffset = this.computePullFromWhere(mq);
