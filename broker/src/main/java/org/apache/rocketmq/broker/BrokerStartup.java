@@ -111,6 +111,11 @@ public class BrokerStartup {
             }
 
             final BrokerConfig brokerConfig = new BrokerConfig();
+
+            // [ZK] 开启属性过滤，计算 FilterBitMap
+            brokerConfig.setEnablePropertyFilter(true);
+            brokerConfig.setEnableCalcFilterBitMap(true);
+
             if (brokerName != null) {
                 brokerConfig.setBrokerName(brokerName);
             }
@@ -122,6 +127,9 @@ public class BrokerStartup {
                 String.valueOf(TlsSystemConfig.tlsMode == TlsMode.ENFORCING))));
             nettyServerConfig.setListenPort(nettyListenPort);
             final MessageStoreConfig messageStoreConfig = new MessageStoreConfig();
+
+            // ZK: 开启允许消费队列外数据
+            messageStoreConfig.setEnableConsumeQueueExt(true);
 
             if (BrokerRole.SLAVE == messageStoreConfig.getBrokerRole()) {
                 int ratio = messageStoreConfig.getAccessMessageInMemoryMaxRatio() - 10;

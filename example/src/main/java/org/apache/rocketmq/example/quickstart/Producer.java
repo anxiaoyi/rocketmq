@@ -50,7 +50,7 @@ public class Producer {
          */
         producer.start();
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
             try {
 
                 /*
@@ -60,8 +60,10 @@ public class Producer {
                     "TagA" /* Tag */,
                     ("Hello RocketMQ " + i).getBytes(RemotingHelper.DEFAULT_CHARSET) /* Message body */
                 );
+                msg.putUserProperty("a", String.valueOf(i));
+                msg.putUserProperty("SequenceId", String.valueOf(i));
 
-                Thread.sleep(1000);
+                Thread.sleep(100);
 
                 /*
                  * Call send message to deliver message to one of brokers.

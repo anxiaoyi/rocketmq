@@ -35,8 +35,12 @@ public class Consumer {
         /*
          * Instantiate with specified consumer group name.
          */
-        consumer = new DefaultMQPushConsumer("please_rename_unique_group_name");
+        consumer = new DefaultMQPushConsumer(getConsumerGroup());
         init(consumer);
+    }
+
+    protected String getConsumerGroup() {
+        return "please_rename_unique_group_name";
     }
 
     protected void init(DefaultMQPushConsumer consumer) throws MQClientException {
@@ -60,30 +64,34 @@ public class Consumer {
         /*
          * Subscribe one more more topics to consume.
          */
-        consumer.subscribe("TopicTest", "TagA");
+        subscribe(consumer);
 
 //        consumer.setMessageModel(MessageModel.BROADCASTING);
 
         /*
          *  Register callback to execute on arrival of messages fetched from brokers.
          */
-//        consumer.registerMessageListener(new MessageListenerConcurrently() {
-//
-//            @Override
-//            public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs,
-//                                                            ConsumeConcurrentlyContext context) {
-//                System.out.printf("%s Receive New Messages: %s %n", Thread.currentThread().getName(), msgs);
-//                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
-//            }
-//        });
+        consumer.registerMessageListener(new MessageListenerConcurrently() {
 
-        consumer.registerMessageListener(new MessageListenerOrderly() {
             @Override
-            public ConsumeOrderlyStatus consumeMessage(List<MessageExt> msgs, ConsumeOrderlyContext context) {
+            public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs,
+                                                            ConsumeConcurrentlyContext context) {
                 System.out.printf("%s Receive New Messages: %s %n", Thread.currentThread().getName(), msgs);
-                return ConsumeOrderlyStatus.SUCCESS;
+                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }
         });
+
+//        consumer.registerMessageListener(new MessageListenerOrderly() {
+//            @Override
+//            public ConsumeOrderlyStatus consumeMessage(List<MessageExt> msgs, ConsumeOrderlyContext context) {
+//                System.out.printf("%s Receive New Messages: %s %n", Thread.currentThread().getName(), msgs);
+//                return ConsumeOrderlyStatus.SUCCESS;
+//            }
+//        });
+    }
+
+    protected void subscribe(DefaultMQPushConsumer consumer) throws MQClientException {
+        consumer.subscribe("TopicTest", "TagA");
     }
 
     public void start() throws MQClientException {
