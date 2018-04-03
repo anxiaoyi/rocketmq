@@ -87,6 +87,7 @@ public class QueryMsgByOffsetSubCommand implements SubCommand {
             if (pullResult != null) {
                 switch (pullResult.getPullStatus()) {
                     case FOUND:
+                        System.out.println(pullResult.getMsgFoundList().get(0));
                         QueryMsgByIdSubCommand.printMsg(defaultMQAdminExt, pullResult.getMsgFoundList().get(0));
                         break;
                     case NO_MATCHED_MSG:

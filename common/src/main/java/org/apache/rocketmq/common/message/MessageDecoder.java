@@ -76,6 +76,12 @@ public class MessageDecoder {
         return UtilAll.bytes2string(byteBuffer.array());
     }
 
+    public static void main(String...args) throws Exception {
+
+        MessageId messageId = decodeMessageId("0A6C73D9696D18B4AAC20D82316E0000");
+
+    }
+
     public static MessageId decodeMessageId(final String msgId) throws UnknownHostException {
         SocketAddress address;
         long offset;

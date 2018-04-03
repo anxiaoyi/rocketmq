@@ -247,6 +247,7 @@ public class MQAdminImpl {
         try {
             messageId = MessageDecoder.decodeMessageId(msgId);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new MQClientException(ResponseCode.NO_MESSAGE, "query message by id finished, but no message.");
         }
         return this.mQClientFactory.getMQClientAPIImpl().viewMessage(RemotingUtil.socketAddress2String(messageId.getAddress()),
