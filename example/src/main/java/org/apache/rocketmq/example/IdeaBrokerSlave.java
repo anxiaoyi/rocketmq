@@ -23,6 +23,7 @@ public class IdeaBrokerSlave {
         BrokerStartup.setBrokerName("zk-pc-slave");
         BrokerStartup.setBrokerId(1);
         BrokerStartup.setStorePathRootDir(System.getProperty("user.home") + File.separator + "slave-store");
+        BrokerStartup.setHaMasterAddress("localhost");
 
         BrokerStartup.main(new String[]{ "-n", "localhost:9876" });
         System.out.println("The Slave Broker Server boot success.");

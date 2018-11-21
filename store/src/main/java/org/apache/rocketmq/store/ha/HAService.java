@@ -82,6 +82,7 @@ public class HAService {
             result
                 && ((masterPutWhere - this.push2SlaveMaxOffset.get()) < this.defaultMessageStore
                 .getMessageStoreConfig().getHaSlaveFallbehindMax());
+        System.out.printf("connectionCount: %d, masterPutWhere: %d, slavePutWhere: %d, isSlaveOk: %s\n", this.connectionCount.get(), masterPutWhere, this.push2SlaveMaxOffset.get(), result);
         return result;
     }
 
@@ -496,6 +497,7 @@ public class HAService {
         private boolean connectMaster() throws ClosedChannelException {
             if (null == socketChannel) {
                 String addr = this.masterAddress.get();
+                System.out.printf("connect master %s\n", this.masterAddress.get());
                 if (addr != null) {
 
                     SocketAddress socketAddress = RemotingUtil.string2SocketAddress(addr);

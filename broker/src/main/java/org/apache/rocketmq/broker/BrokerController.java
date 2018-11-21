@@ -332,6 +332,7 @@ public class BrokerController {
             }
 
             if (BrokerRole.SLAVE == this.messageStoreConfig.getBrokerRole()) {
+                System.out.printf("[BrokerController] haMasterAddress: %s\n", this.messageStoreConfig.getHaMasterAddress());
                 if (this.messageStoreConfig.getHaMasterAddress() != null && this.messageStoreConfig.getHaMasterAddress().length() >= 6) {
                     this.messageStore.updateHaMasterAddress(this.messageStoreConfig.getHaMasterAddress());
                     this.updateMasterHAServerAddrPeriodically = false;

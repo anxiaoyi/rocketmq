@@ -61,6 +61,7 @@ public class BrokerStartup {
     private static BrokerRole brokerRole = BrokerRole.ASYNC_MASTER;
     private static long brokerId = MixAll.MASTER_ID;
     private static String storePathRootDir = System.getProperty("user.home") + File.separator + "store";
+    private static String haMasterAddress = null;
 
     public static void setNettyListenPort(int port) {
         BrokerStartup.nettyListenPort = port;
@@ -80,6 +81,10 @@ public class BrokerStartup {
 
     public static void setStorePathRootDir(String storePathRootDir) {
         BrokerStartup.storePathRootDir = storePathRootDir;
+    }
+
+    public static void setHaMasterAddress(String haMasterAddress) {
+        BrokerStartup.haMasterAddress = haMasterAddress;
     }
 
     // ~~~~~~~~~~~~~~~~~~~
@@ -153,6 +158,7 @@ public class BrokerStartup {
             messageStoreConfig.setEnableConsumeQueueExt(true);
             messageStoreConfig.setBrokerRole(BrokerStartup.brokerRole);
             messageStoreConfig.setStorePathRootDir(storePathRootDir);
+            messageStoreConfig.setHaMasterAddress(haMasterAddress);
 
             if (BrokerRole.SLAVE == messageStoreConfig.getBrokerRole()) {
                 int ratio = messageStoreConfig.getAccessMessageInMemoryMaxRatio() - 10;
