@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
@@ -53,8 +54,13 @@ public class BrokerStartup {
     public static String configFile = null;
     public static Logger log;
 
+    // ~~~~~~~~~~~~~~~~~~~
+    // 应该是自己加的
     private static String brokerName;
     private static int nettyListenPort = 10911;
+    private static BrokerRole brokerRole = BrokerRole.ASYNC_MASTER;
+    private static long brokerId = MixAll.MASTER_ID;
+    private static String storePathRootDir = System.getProperty("user.home") + File.separator + "store";
 
     public static void setNettyListenPort(int port) {
         BrokerStartup.nettyListenPort = port;
@@ -63,6 +69,20 @@ public class BrokerStartup {
     public static void setBrokerName(String brokerName) {
         BrokerStartup.brokerName = brokerName;
     }
+
+    public static void setBrokerRole(BrokerRole brokerRole) {
+        BrokerStartup.brokerRole = brokerRole;
+    }
+
+    public static void setBrokerId(long brokerId) {
+        BrokerStartup.brokerId = brokerId;
+    }
+
+    public static void setStorePathRootDir(String storePathRootDir) {
+        BrokerStartup.storePathRootDir = storePathRootDir;
+    }
+
+    // ~~~~~~~~~~~~~~~~~~~
 
     public static void main(String[] args) {
         start(createBrokerController(args));
@@ -115,6 +135,7 @@ public class BrokerStartup {
             // [ZK] 开启属性过滤，计算 FilterBitMap
             brokerConfig.setEnablePropertyFilter(true);
             brokerConfig.setEnableCalcFilterBitMap(true);
+            brokerConfig.setBrokerId(BrokerStartup.brokerId);
 
             if (brokerName != null) {
                 brokerConfig.setBrokerName(brokerName);
@@ -130,6 +151,8 @@ public class BrokerStartup {
 
             // ZK: 开启允许消费队列外数据
             messageStoreConfig.setEnableConsumeQueueExt(true);
+            messageStoreConfig.setBrokerRole(BrokerStartup.brokerRole);
+            messageStoreConfig.setStorePathRootDir(storePathRootDir);
 
             if (BrokerRole.SLAVE == messageStoreConfig.getBrokerRole()) {
                 int ratio = messageStoreConfig.getAccessMessageInMemoryMaxRatio() - 10;
