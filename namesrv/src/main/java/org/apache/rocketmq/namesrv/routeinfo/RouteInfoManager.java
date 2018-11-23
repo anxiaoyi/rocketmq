@@ -125,6 +125,7 @@ public class RouteInfoManager {
                 }
                 String oldAddr = brokerData.getBrokerAddrs().put(brokerId, brokerAddr);
                 registerFirst = registerFirst || (null == oldAddr);
+                System.out.printf("[RouterInfoManager] brokerData: %s\n", brokerData);
 
                 if (null != topicConfigWrapper
                     && MixAll.MASTER_ID == brokerId) {
@@ -158,8 +159,10 @@ public class RouteInfoManager {
                     }
                 }
 
+                System.out.printf("[RouteInfoManager] brokerId: %d\n", brokerId);
                 if (MixAll.MASTER_ID != brokerId) {
                     String masterAddr = brokerData.getBrokerAddrs().get(MixAll.MASTER_ID);
+                    System.out.printf("[RouteInfoManager] masterAddr: %s\n", masterAddr);
                     if (masterAddr != null) {
                         BrokerLiveInfo brokerLiveInfo = this.brokerLiveTable.get(masterAddr);
                         if (brokerLiveInfo != null) {

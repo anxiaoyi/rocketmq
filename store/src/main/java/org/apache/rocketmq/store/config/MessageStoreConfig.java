@@ -16,9 +16,10 @@
  */
 package org.apache.rocketmq.store.config;
 
-import java.io.File;
 import org.apache.rocketmq.common.annotation.ImportantField;
 import org.apache.rocketmq.store.ConsumeQueue;
+
+import java.io.File;
 
 public class MessageStoreConfig {
     //The root directory in which the log data is kept
@@ -142,6 +143,17 @@ public class MessageStoreConfig {
     private boolean transientStorePoolEnable = false;
     private int transientStorePoolSize = 5;
     private boolean fastFailIfNoBufferInStorePool = false;
+
+    // 自己添加的
+    private boolean startHAAccept = true;
+
+    public boolean isStartHAAccept() {
+        return startHAAccept;
+    }
+
+    public void setStartHAAccept(boolean startHAAccept) {
+        this.startHAAccept = startHAAccept;
+    }
 
     public boolean isDebugLockEnable() {
         return debugLockEnable;

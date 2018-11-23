@@ -109,6 +109,8 @@ public class BrokerOuterAPI {
         final int timeoutMills) {
         RegisterBrokerResult registerBrokerResult = null;
 
+        System.out.printf("registerBrokerAll haServerAddr: %s\n", haServerAddr);
+
         List<String> nameServerAddressList = this.remotingClient.getNameServerAddressList();
         if (nameServerAddressList != null) {
             for (String namesrvAddr : nameServerAddressList) {

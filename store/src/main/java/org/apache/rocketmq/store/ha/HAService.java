@@ -16,22 +16,6 @@
  */
 package org.apache.rocketmq.store.ha;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import org.apache.rocketmq.common.ServiceThread;
 import org.apache.rocketmq.common.constant.LoggerName;
 import org.apache.rocketmq.remoting.common.RemotingUtil;
@@ -39,6 +23,19 @@ import org.apache.rocketmq.store.CommitLog;
 import org.apache.rocketmq.store.DefaultMessageStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.nio.ByteBuffer;
+import java.nio.channels.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class HAService {
     private static final Logger log = LoggerFactory.getLogger(LoggerName.STORE_LOGGER_NAME);
@@ -67,6 +64,7 @@ public class HAService {
     }
 
     public void updateMasterAddress(final String newAddr) {
+        System.out.printf("updateMasterAddress with %s\n", newAddr);
         if (this.haClient != null) {
             this.haClient.updateMasterAddress(newAddr);
         }
@@ -82,7 +80,7 @@ public class HAService {
             result
                 && ((masterPutWhere - this.push2SlaveMaxOffset.get()) < this.defaultMessageStore
                 .getMessageStoreConfig().getHaSlaveFallbehindMax());
-        System.out.printf("connectionCount: %d, masterPutWhere: %d, slavePutWhere: %d, isSlaveOk: %s\n", this.connectionCount.get(), masterPutWhere, this.push2SlaveMaxOffset.get(), result);
+        System.out.printf("[HAService] connectionCount: %d, masterPutWhere: %d, slavePutWhere: %d, isSlaveOk: %s\n", this.connectionCount.get(), masterPutWhere, this.push2SlaveMaxOffset.get(), result);
         return result;
     }
 
@@ -107,8 +105,11 @@ public class HAService {
     // }
 
     public void start() throws Exception {
-        this.acceptSocketService.beginAccept();
-        this.acceptSocketService.start();
+        if (this.defaultMessageStore.getMessageStoreConfig().isStartHAAccept()) {
+            this.acceptSocketService.beginAccept();
+            this.acceptSocketService.start();
+        }
+
         this.groupTransferService.start();
         this.haClient.start();
     }
@@ -127,7 +128,11 @@ public class HAService {
 
     public void shutdown() {
         this.haClient.shutdown();
-        this.acceptSocketService.shutdown(true);
+
+        if (this.defaultMessageStore.getMessageStoreConfig().isStartHAAccept()) {
+            this.acceptSocketService.shutdown(true);
+        }
+
         this.destroyConnections();
         this.groupTransferService.shutdown();
     }
@@ -178,6 +183,8 @@ public class HAService {
             this.serverSocketChannel.socket().bind(this.socketAddressListen);
             this.serverSocketChannel.configureBlocking(false);
             this.serverSocketChannel.register(this.selector, SelectionKey.OP_ACCEPT);
+
+            System.out.printf("AcceptSocketService bind on %s\n", this.socketAddressListen);
         }
 
         /**
@@ -214,6 +221,7 @@ public class HAService {
                                 if (sc != null) {
                                     HAService.log.info("HAService receive new connection, "
                                         + sc.socket().getRemoteSocketAddress());
+                                    System.out.printf("HAService receive new connection: %s\n", sc.socket().getRemoteSocketAddress());
 
                                     try {
                                         HAConnection conn = new HAConnection(HAService.this, sc);
@@ -497,10 +505,10 @@ public class HAService {
         private boolean connectMaster() throws ClosedChannelException {
             if (null == socketChannel) {
                 String addr = this.masterAddress.get();
-                System.out.printf("connect master %s\n", this.masterAddress.get());
                 if (addr != null) {
-
+                    System.out.printf("[HAService] connect master %s\n", addr);
                     SocketAddress socketAddress = RemotingUtil.string2SocketAddress(addr);
+                    System.out.printf("[HAService] connect master socketAddress %s\n", socketAddress);
                     if (socketAddress != null) {
                         this.socketChannel = RemotingUtil.connect(socketAddress);
                         if (this.socketChannel != null) {

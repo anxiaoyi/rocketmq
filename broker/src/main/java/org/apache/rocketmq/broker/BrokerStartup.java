@@ -62,6 +62,8 @@ public class BrokerStartup {
     private static long brokerId = MixAll.MASTER_ID;
     private static String storePathRootDir = System.getProperty("user.home") + File.separator + "store";
     private static String haMasterAddress = null;
+    private static int haListenPort = 10912;
+    private static boolean startHAAccept = true;
 
     public static void setNettyListenPort(int port) {
         BrokerStartup.nettyListenPort = port;
@@ -86,6 +88,12 @@ public class BrokerStartup {
     public static void setHaMasterAddress(String haMasterAddress) {
         BrokerStartup.haMasterAddress = haMasterAddress;
     }
+
+    public static void setHaListenPort(int haListenPort) {
+        BrokerStartup.haListenPort = haListenPort;
+    }
+
+    public static void setStartHAAccept(boolean startHAAccept) { BrokerStartup.startHAAccept = startHAAccept; }
 
     // ~~~~~~~~~~~~~~~~~~~
 
@@ -159,6 +167,7 @@ public class BrokerStartup {
             messageStoreConfig.setBrokerRole(BrokerStartup.brokerRole);
             messageStoreConfig.setStorePathRootDir(storePathRootDir);
             messageStoreConfig.setHaMasterAddress(haMasterAddress);
+            messageStoreConfig.setStartHAAccept(startHAAccept);
 
             if (BrokerRole.SLAVE == messageStoreConfig.getBrokerRole()) {
                 int ratio = messageStoreConfig.getAccessMessageInMemoryMaxRatio() - 10;
@@ -223,7 +232,11 @@ public class BrokerStartup {
                     break;
             }
 
+            // 默认激活的是下面这句话
             messageStoreConfig.setHaListenPort(nettyServerConfig.getListenPort() + 1);
+            // 为了调试代码，加上了下面这句话
+            messageStoreConfig.setHaListenPort(haListenPort);
+
             LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
             JoranConfigurator configurator = new JoranConfigurator();
             configurator.setContext(lc);

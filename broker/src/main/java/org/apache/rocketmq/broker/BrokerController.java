@@ -705,6 +705,8 @@ public class BrokerController {
             this.brokerConfig.getRegisterBrokerTimeoutMills());
 
         if (registerBrokerResult != null) {
+            System.out.printf("[BrokerController] registerBrokerResult.haServerAddr: %s\n", registerBrokerResult.getHaServerAddr());
+
             if (this.updateMasterHAServerAddrPeriodically && registerBrokerResult.getHaServerAddr() != null) {
                 this.messageStore.updateHaMasterAddress(registerBrokerResult.getHaServerAddr());
             }
