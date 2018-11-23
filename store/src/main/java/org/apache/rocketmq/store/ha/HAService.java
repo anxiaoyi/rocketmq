@@ -376,6 +376,7 @@ public class HAService {
             for (int i = 0; i < 3 && this.reportOffset.hasRemaining(); i++) {
                 try {
                     this.socketChannel.write(this.reportOffset);
+                    System.out.printf("[HAClient] report current offset to master %d\n", maxOffset);
                 } catch (IOException e) {
                     log.error(this.getServiceName()
                         + "reportSlaveMaxOffset this.socketChannel.write exception", e);
@@ -448,6 +449,8 @@ public class HAService {
                 if (diff >= msgHeaderSize) {
                     long masterPhyOffset = this.byteBufferRead.getLong(this.dispatchPostion);
                     int bodySize = this.byteBufferRead.getInt(this.dispatchPostion + 8);
+
+                    System.out.printf("[HAClient] read master offset: %d, bodySize: %d\n", masterPhyOffset, bodySize);
 
                     long slavePhyOffset = HAService.this.defaultMessageStore.getMaxPhyOffset();
 

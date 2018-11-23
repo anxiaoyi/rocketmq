@@ -161,7 +161,10 @@ public class HAConnection {
                         this.lastReadTimestamp = HAConnection.this.haService.getDefaultMessageStore().getSystemClock().now();
                         if ((this.byteBufferRead.position() - this.processPostion) >= 8) {
                             int pos = this.byteBufferRead.position() - (this.byteBufferRead.position() % 8);
+
                             long readOffset = this.byteBufferRead.getLong(pos - 8);
+                            System.out.printf("[HAConnection-%s] read offset: %d\n", HAConnection.this.clientAddr, readOffset);
+
                             this.processPostion = pos;
 
                             HAConnection.this.slaveAckOffset = readOffset;
@@ -330,6 +333,8 @@ public class HAConnection {
             // Write Header
             while (this.byteBufferHeader.hasRemaining()) {
                 int writeSize = this.socketChannel.write(this.byteBufferHeader);
+                System.out.printf("[HAConnection-%s] transfer header data size %d.\n", HAConnection.this.clientAddr, writeSize);
+
                 if (writeSize > 0) {
                     writeSizeZeroTimes = 0;
                     this.lastWriteTimestamp = HAConnection.this.haService.getDefaultMessageStore().getSystemClock().now();
@@ -352,6 +357,8 @@ public class HAConnection {
             if (!this.byteBufferHeader.hasRemaining()) {
                 while (this.selectMappedBufferResult.getByteBuffer().hasRemaining()) {
                     int writeSize = this.socketChannel.write(this.selectMappedBufferResult.getByteBuffer());
+                    System.out.printf("[HAConnection] transfer body data size %d.\n", writeSize);
+
                     if (writeSize > 0) {
                         writeSizeZeroTimes = 0;
                         this.lastWriteTimestamp = HAConnection.this.haService.getDefaultMessageStore().getSystemClock().now();
